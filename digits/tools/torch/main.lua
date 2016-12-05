@@ -558,7 +558,15 @@ local function updateConfusion(y,yt)
     end
 end
 
-local dataHook = network.dataHook or function (input, dblabel) return input, dblabel end
+local dataHook = network.dataHook
+if not dataHook then
+    if network.labelHook then
+        local labelHook = network.labelHook
+        dataHook = function (input, dblabel) return input, labelHook(input, dblabel) end
+    else
+        dataHook = function (input, dblabel) return input, dblabel end
+    end
+end
 
 -- Optimization configuration
 logmessage.display(0,'initializing the parameters for Optimizer')
